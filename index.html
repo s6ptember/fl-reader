@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Reader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background: #000;
+        }
+        /* Refined Liquid Glass */
+        .glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                inset 0 0 20px rgba(255, 255, 255, 0.05),
+                0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .specular-highlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 40%);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .refractive-edge {
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Custom Scrollbar for Reader */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-up {
+            animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1); /* iOS-like easing */
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+    </style>
+</head>
+<body class="bg-black text-white overflow-hidden selection:bg-blue-500/30">
+    
+    <div id="root" class="relative min-h-screen w-full">
+        <!-- Background Content Layer -->
+        <div class="fixed inset-0 z-0 bg-black pointer-events-none"></div>
+
+        <!-- Main UI Layer -->
+        <main id="main-container" class="relative z-10 w-full min-h-screen flex flex-col items-center">
+            <!-- Content Injected Here -->
+        </main>
+
+        <!-- Persistent iOS 26 Tab Bar (Library Only) -->
+        <nav id="tab-bar" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500">
+            <div class="glass px-6 py-3 rounded-[40px] flex items-center gap-8 specular-highlight shadow-2xl transition-all duration-500 hover:scale-105 active:scale-95">
+                <button class="flex flex-col items-center gap-1 group">
+                    <div class="w-6 h-6 rounded-full bg-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                    </div>
+                    <span class="text-[10px] font-medium text-blue-400">Library</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <span class="text-[10px] font-medium">Reading</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    <span class="text-[10px] font-medium">Saved</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span class="text-[10px] font-medium">Account</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const BOOKS = [
+          {
+            id: '1',
+            title: 'The Infinite Sea',
+            author: 'Elena Thorne',
+            coverImage: 'https://picsum.photos/seed/sea/400/600',
+            progress: 45,
+            category: 'Fantasy',
+            rating: 4.8,
+            content: `Chapter 1: The Call of the Depths\n\nThe ocean was not just water to Mara; it was a living, breathing entity that whispered secrets in the crash of every wave. On this particular morning, the whispers were louder than usual. \n\n"The tides are shifting," her grandfather had warned before his departure. But Mara didn't expect the shift to be so literal. As she stood on the pier, the water beneath her didn't just ripple; it seemed to glow with a soft, bioluminescent hum. \n\nShe reached out a hand, her fingers barely skimming the surface. A jolt of electricity, cold as ice yet burning with intent, shot through her arm. The sea was calling, and for the first time in her seventeen years, she felt ready to answer.`
+          },
+          {
+            id: '2',
+            title: 'Silicon Dreams',
+            author: 'Marcus Vance',
+            coverImage: 'https://picsum.photos/seed/tech/400/600',
+            progress: 12,
+            category: 'Sci-Fi',
+            rating: 4.5,
+            content: `The year was 2084, and Neo-Tokyo was bathed in the perpetual glow of neon advertisements. Kael sat in his cramped apartment, the haptic sensors on his neck buzzing with the latest neural feed. \n\n"Download complete," the synthetic voice of his AI assistant, LUNA, echoed in his mind. "The blueprints for the subconscious bridge are now active." \n\nKael closed his eyes. The physical world dissolved into a cascading torrent of green data. He was no longer a man in a room; he was a ghost in the machine, searching for a memory that shouldn't exist.`
+          },
+          {
+            id: '3',
+            title: 'Autumn Whispers',
+            author: 'Sarah Jenkins',
+            coverImage: 'https://picsum.photos/seed/forest/400/600',
+            progress: 89,
+            category: 'Romance',
+            rating: 4.2,
+            content: `The leaves had turned a fiery orange, blanketing the cobblestone streets of Oakhaven. Clara adjusted her scarf, the crisp air stinging her cheeks. \n\nShe hadn't been back to the library in years, but the scent of old paper and beeswax was instantly familiar. In the corner, by the window overlooking the park, sat Julian. He looked exactly as he had ten years ago, save for the faint lines of experience around his eyes. \n\n"You came," he said softly, not looking up from his book. \n\n"I always come back for a good story," Clara replied, her heart beating a rhythm she thought she'd forgotten.`
+          },
+          {
+            id: '4',
+            title: 'Lunar Colony',
+            author: 'Dr. Aris Thorne',
+            coverImage: 'https://picsum.photos/seed/moon/400/600',
+            progress: 0,
+            category: 'Science',
+            rating: 4.9,
+            content: `Building a civilization on the moon requires more than just oxygen and concrete; it requires a fundamental shift in how we perceive distance. \n\nOn Earth, a kilometer is a walk. On the Moon, it is a calculation of life support, radiation exposure, and kinetic energy. This manual serves as the primary directive for all Level 1 Engineers assigned to the Copernicus Crater settlement. \n\nSafety is not a protocol; it is an environment.`
+          },
+          {
+            id: '5',
+            title: 'Beyond the Veil',
+            author: 'Isabella Night',
+            coverImage: 'https://picsum.photos/seed/ghost/400/600',
+            progress: 67,
+            category: 'Mystery',
+            rating: 4.6,
+            content: `The mansion didn't just look haunted; it felt hungry. Every creak of the floorboards sounded like a sigh of satisfaction. Detective Miller didn't believe in ghosts, but he did believe in the way the temperature dropped exactly ten degrees the moment he crossed the threshold. \n\n"The Blackwell family was always private," the neighbors said. Private was an understatement. They were invisible. Until the lights in the attic started flashing in Morse code.`
+          },
+          {
+            id: '6',
+            title: 'Gilded Horizons',
+            author: 'Xavier Flint',
+            coverImage: 'https://picsum.photos/seed/gold/400/600',
+            progress: 30,
+            category: 'Historical',
+            rating: 4.4,
+            content: `The gold rush was a fever that consumed the sane and the desperate alike. In 1849, the Sacramento river was more than a waterway; it was a promise. \n\nThomas gripped his shovel, his knuckles white. He had sold everything back in Boston—the house, the shop, his father's watch—for a chance to touch the sun. "Just one nugget," he whispered to the mud. "Just one."`
+          }
+        ];
+
+        // --- STATE MANAGMEENT ---
+        const state = {
+            currentView: 'library', // 'library' | 'reader'
+            selectedBook: null,
+            fontSize: 18,
+            scrollProgress: 0,
+            searchTerm: '',
+            isControlsVisible: true
+        };
+
+        const elements = {
+            mainContainer: document.getElementById('main-container'),
+            tabBar: document.getElementById('tab-bar')
+        };
+
+        // --- RENDER FUNCTIONS ---
+        
+        function render() {
+            elements.mainContainer.innerHTML = '';
+            
+            if (state.currentView === 'library') {
+                renderLibrary();
+                elements.tabBar.style.display = 'block';
+            } else if (state.currentView === 'reader' && state.selectedBook) {
+                renderReader();
+                elements.tabBar.style.display = 'none';
+            }
+        }
+
+        function renderLibrary() {
+            // Filter books
+            const filteredBooks = BOOKS.filter(b => 
+                b.title.toLowerCase().includes(state.searchTerm.toLowerCase()) || 
+                b.author.toLowerCase().includes(state.searchTerm.toLowerCase())
+            );
+
+            // Container
+            const container = document.createElement('div');
+            container.className = "w-full max-w-4xl px-6 py-12 pb-32 fade-in";
+
+            // Header (Search)
+            const header = document.createElement('header');
+            header.className = "flex items-center justify-end mb-12";
+            header.innerHTML = `
+                <div class="glass px-4 py-3 rounded-[32px] specular-highlight flex items-center gap-3 w-48 md:w-64 transition-all focus-within:w-full md:focus-within:w-72">
+                  <svg class="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input 
+                    type="text" 
+                    placeholder="Search books..." 
+                    class="bg-transparent border-none outline-none text-sm w-full placeholder:text-white/30 text-white"
+                    id="search-input"
+                    value="${state.searchTerm}"
+                  />
+                </div>
+            `;
+            container.appendChild(header);
+
+            // Grid Section
+            const grid = document.createElement('section');
+            grid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-10";
+            
+            filteredBooks.forEach(book => {
+                const bookEl = document.createElement('div');
+                bookEl.className = "group cursor-pointer flex flex-col gap-3";
+                bookEl.onclick = () => openBook(book);
+
+                bookEl.innerHTML = `
+                    <div class="relative aspect-[2/3] w-full rounded-[24px] overflow-hidden transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 group-active:scale-95 shadow-xl group-hover:shadow-2xl">
+                        <img src="${book.coverImage}" alt="${book.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        ${book.progress > 0 ? `
+                        <div class="absolute bottom-3 left-3 right-3 glass py-1.5 px-3 rounded-[20px] text-[10px] font-bold tracking-widest uppercase flex items-center justify-between">
+                            <span>${book.progress}%</span>
+                            <div class="w-12 h-1 bg-white/20 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-400" style="width: ${book.progress}%"></div>
+                            </div>
+                        </div>` : ''}
+                    </div>
+                    <div class="px-1">
+                        <h3 class="text-sm font-semibold truncate group-hover:text-blue-400 transition-colors">${book.title}</h3>
+                        <p class="text-xs text-white/40 truncate">${book.author}</p>
+                    </div>
+                `;
+                grid.appendChild(bookEl);
+            });
+
+            container.appendChild(grid);
+
+            // Empty State
+            if (filteredBooks.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = "flex flex-col items-center justify-center py-32 opacity-20";
+                emptyState.innerHTML = `
+                  <svg class="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <p class="text-lg">No books found</p>
+                `;
+                container.appendChild(emptyState);
+            }
+
+            elements.mainContainer.appendChild(container);
+
+            // Re-attach Search Listener
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                state.searchTerm = e.target.value;
+                // Simple re-render of just the grid would be better but for now full re-render is fast enough
+                render(); 
+                // restore focus
+                setTimeout(() => {
+                    const input = document.getElementById('search-input');
+                    if(input) {
+                        input.focus();
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                }, 0);
+            });
+        }
+
+        function renderReader() {
+            const book = state.selectedBook;
+            const readerContainer = document.createElement('div');
+            // Using slide-up animation simulation via class
+            readerContainer.className = "fixed inset-0 z-[100] bg-[#0d0d0f] flex flex-col slide-up";
+            
+            readerContainer.innerHTML = `
+                <!-- Background Refraction Mockup -->
+                <div class="absolute inset-0 opacity-20 pointer-events-none">
+                    <img src="${book.coverImage}" class="w-full h-full object-cover blur-[100px] scale-150" alt="background" />
+                </div>
+
+                <!-- Floating Header Control -->
+                <nav id="reader-header" class="fixed top-8 left-1/2 -translate-x-1/2 z-[110] transition-all duration-700 ${state.isControlsVisible ? 'translate-y-0 opacity-100' : '-translate-y-24 opacity-0'}">
+                    <div class="glass px-6 py-3 rounded-[32px] flex items-center gap-6 specular-highlight shadow-2xl">
+                        <button id="close-btn" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center active:scale-90">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <div class="flex flex-col items-center">
+                            <h2 class="text-sm font-bold tracking-tight max-w-[120px] truncate">${book.title}</h2>
+                            <span class="text-[10px] text-white/50">${book.author}</span>
+                        </div>
+                         <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center active:scale-90">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- Reading Content -->
+                <div id="content-scroll-area" class="flex-1 overflow-y-auto px-8 md:px-0 pt-32 pb-48 scroll-smooth z-10">
+                    <div class="max-w-2xl mx-auto space-y-8 leading-relaxed text-white/90 transition-all duration-300" style="font-size: ${state.fontSize}px;">
+                         <div class="text-center mb-16">
+                            <div class="w-32 h-48 mx-auto rounded-2xl overflow-hidden shadow-2xl mb-6 glass p-1">
+                               <img src="${book.coverImage}" class="w-full h-full object-cover rounded-xl" />
+                            </div>
+                            <h1 class="text-4xl font-bold mb-2">${book.title}</h1>
+                            <p class="text-xl text-white/40 italic">${book.author}</p>
+                         </div>
+                         <div class="whitespace-pre-wrap selection:bg-blue-500/40 first-letter:text-6xl first-letter:font-serif first-letter:mr-3 first-letter:float-left first-letter:text-blue-400">
+                            ${book.content.repeat(8)}
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Floating Bottom Control Bar -->
+                 <footer id="reader-footer" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[110] transition-all duration-700 delay-100 ${state.isControlsVisible ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'}">
+                    <div class="glass px-8 py-4 rounded-[40px] flex items-center gap-10 specular-highlight shadow-2xl backdrop-blur-3xl">
+                         <!-- Font Controls -->
+                        <div class="flex items-center gap-4 border-r border-white/10 pr-6">
+                            <button id="font-decrease" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-xs font-bold">A</button>
+                            <span id="font-size-display" class="text-xs font-medium w-8 text-center">${state.fontSize}</span>
+                            <button id="font-increase" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-lg font-bold">A</button>
+                        </div>
+                         <!-- Progress Pill -->
+                        <div class="flex flex-col gap-2 min-w-[140px]">
+                            <div class="flex justify-between text-[10px] font-bold tracking-widest text-white/40 uppercase">
+                                <span>Progress</span>
+                                <span id="progress-text">${Math.round(state.scrollProgress)}%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)] transition-all duration-300" style="width: ${state.scrollProgress}%"></div>
+                            </div>
+                        </div>
+                         <!-- Bookmark -->
+                         <button class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 border border-blue-400/30 hover:bg-blue-500/30 transition-all active:scale-90">
+                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                             </svg>
+                         </button>
+                    </div>
+                 </footer>
+
+                 <!-- Edge Gradient -->
+                 <div class="fixed inset-0 pointer-events-none z-50">
+                    <div class="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#0d0d0f] to-transparent"></div>
+                    <div class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-[#0d0d0f] to-transparent"></div>
+                </div>
+            `;
+
+            elements.mainContainer.appendChild(readerContainer);
+
+            // Event Listeners
+            const scrollArea = document.getElementById('content-scroll-area');
+            const header = document.getElementById('reader-header');
+            const footer = document.getElementById('reader-footer');
+
+            // Scroll Handler
+            scrollArea.addEventListener('scroll', () => {
+                const scrollTop = scrollArea.scrollTop;
+                const scrollHeight = scrollArea.scrollHeight;
+                const clientHeight = scrollArea.clientHeight;
+                
+                // Progress
+                const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
+                state.scrollProgress = progress;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
+
+                // Toggle Controls
+                if (scrollTop > 100) {
+                     state.isControlsVisible = false;
+                     header.classList.remove('translate-y-0', 'opacity-100');
+                     header.classList.add('-translate-y-24', 'opacity-0');
+                     footer.classList.remove('translate-y-0', 'opacity-100');
+                     footer.classList.add('translate-y-24', 'opacity-0');
+                } else {
+                     state.isControlsVisible = true;
+                     header.classList.add('translate-y-0', 'opacity-100');
+                     header.classList.remove('-translate-y-24', 'opacity-0');
+                     footer.classList.add('translate-y-0', 'opacity-100');
+                     footer.classList.remove('translate-y-24', 'opacity-0');
+                }
+            });
+
+            // Mouse Move to show controls
+            scrollArea.addEventListener('mousemove', () => {
+                 if(!state.isControlsVisible) {
+                     state.isControlsVisible = true;
+                     header.classList.add('translate-y-0', 'opacity-100');
+                     header.classList.remove('-translate-y-24', 'opacity-0');
+                     footer.classList.add('translate-y-0', 'opacity-100');
+                     footer.classList.remove('translate-y-24', 'opacity-0');
+                 }
+            });
+
+            // Font Size Controls
+            document.getElementById('font-decrease').addEventListener('click', () => {
+                state.fontSize = Math.max(12, state.fontSize - 2);
+                rerenderContentText();
+            });
+             document.getElementById('font-increase').addEventListener('click', () => {
+                state.fontSize = Math.min(32, state.fontSize + 2);
+                rerenderContentText();
+            });
+
+            // Close Button
+            document.getElementById('close-btn').addEventListener('click', closeBook);
+        }
+
+        function rerenderContentText() {
+            // Instead of full re-render, we can just update style
+             const contentDiv = document.querySelector('#content-scroll-area > div');
+             if(contentDiv) {
+                 contentDiv.style.fontSize = `${state.fontSize}px`;
+                 document.getElementById('font-size-display').innerText = state.fontSize;
+             }
+        }
+
+        // --- ACTIONS ---
+        function openBook(book) {
+            state.selectedBook = book;
+            state.currentView = 'reader';
+            state.scrollProgress = 0;
+            state.isControlsVisible = true;
+            render();
+        }
+
+        function closeBook() {
+            state.selectedBook = null;
+            state.currentView = 'library';
+            render();
+        }
+
+        // Initial Render
+        render();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+Django>=5.0
+requests[socks]
+PySocks
+lxml
+Pillow
+python-decouple

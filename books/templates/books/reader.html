@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }}</title>
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+    <h2>{{ book.author }}</h2>
+    <div>
+        <pre>{{ text }}</pre>
+    </div>
+    <a href="{% url 'books:library' %}">Назад в библиотеку</a>
+</body>
+</html>
