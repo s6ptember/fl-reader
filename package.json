@@ -1,0 +1,24 @@
+{
+  "name": "lumina-reader",
+  "version": "1.0.0",
+  "description": "Web library for reading books online",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build": "npm run build:css && npm run copy:htmx",
+    "copy:htmx": "cp node_modules/htmx.org/dist/htmx.min.js ./static/js/htmx.min.js"
+  },
+  "keywords": [
+    "library",
+    "books",
+    "reader"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  },
+  "dependencies": {
+    "htmx.org": "^2.0.4"
+  }
+}

@@ -1,0 +1,81 @@
+{
+    email admin@s6ptember.online
+
+    servers {
+        protocols h1 h2 h3
+    }
+}
+
+s6ptember.online, www.s6ptember.online {
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/access.log
+        format json
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests"
+        -Server
+    }
+
+    handle_path /static/* {
+        root * /srv/static
+        file_server {
+            precompressed br gzip
+        }
+        header Cache-Control "public, max-age=31536000, immutable"
+    }
+
+    handle_path /media/* {
+        root * /srv/media
+        file_server
+        header Cache-Control "public, max-age=86400"
+    }
+
+    handle /favicon.ico {
+        root * /srv/static
+        rewrite * /favicon.svg
+        file_server
+        header Cache-Control "public, max-age=86400"
+    }
+
+    handle /robots.txt {
+        reverse_proxy web:8000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    handle /sitemap.xml {
+        reverse_proxy web:8000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    handle {
+        reverse_proxy web:8000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+
+            health_uri /
+            health_interval 30s
+            health_timeout 10s
+
+            lb_policy least_conn
+        }
+    }
+
+    @www host www.s6ptember.online
+    redir @www https://s6ptember.online{uri} permanent
+}
