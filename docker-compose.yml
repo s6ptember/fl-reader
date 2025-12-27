@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./db.sqlite3:/app/db.sqlite3
+      - db_data:/app/data
       - media_data:/app/media
       - static_data:/app/staticfiles
     expose:
@@ -31,13 +31,7 @@ services:
     tmpfs:
       - /tmp
       - /app/.cache
-      - type: tmpfs
-        target: /var/lib/tor
-        tmpfs:
-          size: 10M
-          mode: 0700
-          uid: 1000
-          gid: 1000
+      - /var/lib/tor:uid=1000,gid=1000,mode=0700,size=50M
 
   caddy:
     image: caddy:2-alpine
@@ -66,6 +60,8 @@ services:
       - NET_BIND_SERVICE
 
 volumes:
+  db_data:
+    driver: local
   caddy_data:
     driver: local
   caddy_config:

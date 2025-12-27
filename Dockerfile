@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY torrc /etc/tor/torrc
 
 RUN useradd -m -u 1000 appuser && \
-    mkdir -p /app/media /app/staticfiles /var/lib/tor && \
+    mkdir -p /app/data /app/media /app/staticfiles /var/lib/tor && \
     chown -R appuser:appuser /app /var/lib/tor && \
     chmod 700 /var/lib/tor
 
