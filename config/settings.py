@@ -143,6 +143,7 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = (
     "'self'",
     "'unsafe-inline'",
+    "'unsafe-eval'",  # Required for Alpine.js dynamic expressions
     "https://fonts.googleapis.com",
     "https://cdn.jsdelivr.net",
 )
