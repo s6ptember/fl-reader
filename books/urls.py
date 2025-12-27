@@ -11,6 +11,7 @@ urlpatterns = [
     path('search/', views.search_view, name='search'),
     path('download/', views.download_book_view, name='download'),
     path('book/<uuid:book_id>/delete/', views.delete_book_view, name='delete_book'),
+    path('offline/', views.offline_view, name='offline'),
     path('sitemap.xml', views.sitemap_view, name='sitemap'),
     path('robots.txt', views.robots_view, name='robots'),
 ]

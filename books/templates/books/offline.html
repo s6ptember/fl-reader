@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Нет подключения - Lumina Reader{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center space-y-8">
+        <!-- Иконка оффлайн -->
+        <div class="relative mx-auto w-32 h-32">
+            <div class="absolute inset-0 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+            <div class="relative flex items-center justify-center w-full h-full">
+                <svg class="w-24 h-24 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold text-white">
+                Нет подключения
+            </h1>
+            <p class="text-gray-400 text-lg">
+                Проверьте подключение к интернету
+            </p>
+        </div>
+
+        <!-- Информация -->
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+            <div class="text-left space-y-3">
+                <h2 class="text-xl font-semibold text-blue-400">Доступно в offline режиме:</h2>
+                <ul class="space-y-2 text-gray-300">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Ранее просмотренные страницы</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Кэшированные книги и обложки</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Новые книги недоступны без интернета</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="space-y-3">
+            <button
+                onclick="window.location.reload()"
+                class="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/50">
+                <div class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span>Повторить попытку</span>
+                </div>
+            </button>
+
+            <button
+                onclick="history.back()"
+                class="w-full px-6 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all duration-200 backdrop-blur-sm">
+                <div class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span>Назад</span>
+                </div>
+            </button>
+
+            <a
+                href="/"
+                class="block w-full px-6 py-4 bg-white/5 hover:bg-white/10 text-gray-300 font-semibold rounded-xl transition-all duration-200 backdrop-blur-sm">
+                <div class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span>На главную</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Статус подключения -->
+        <div class="pt-6">
+            <div id="connection-status" class="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-full text-sm font-medium">
+                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                <span>Offline</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Отслеживаем изменение статуса подключения
+    function updateConnectionStatus() {
+        const statusEl = document.getElementById('connection-status');
+        if (navigator.onLine) {
+            statusEl.className = 'inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium';
+            statusEl.innerHTML = '<span class="w-2 h-2 bg-green-500 rounded-full"></span><span>Online</span>';
+
+            // Автоматически перезагружаем через 2 секунды после восстановления соединения
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            statusEl.className = 'inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-full text-sm font-medium';
+            statusEl.innerHTML = '<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span><span>Offline</span>';
+        }
+    }
+
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Проверяем статус при загрузке
+    updateConnectionStatus();
+</script>
+{% endblock %}

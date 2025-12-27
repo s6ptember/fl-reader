@@ -238,3 +238,9 @@ Disallow: /search/
 Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml
 """
     return HttpResponse(robots_txt, content_type='text/plain')
+
+
+@require_http_methods(["GET"])
+def offline_view(request):
+    """Страница для offline режима PWA"""
+    return render(request, 'books/offline.html')

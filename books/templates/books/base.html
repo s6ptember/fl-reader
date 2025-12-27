@@ -14,8 +14,22 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
 
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
-    <link rel="apple-touch-icon" href="{% static 'favicon.svg' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/apple-touch-icon.png' %}">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lumina">
+
+    <!-- Android PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes">
 
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:title" content="{% block og_title %}Lumina Reader - Онлайн библиотека для чтения книг{% endblock %}">
@@ -96,7 +110,89 @@
         });
     </script>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{% static 'js/alpine.min.js' %}"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{% static "sw.js" %}')
+                    .then((registration) => {
+                        console.log('✅ Service Worker зарегистрирован:', registration.scope);
+
+                        // Проверяем обновления каждые 60 секунд
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000);
+
+                        // Обработка обновления Service Worker
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Новая версия доступна
+                                    if (confirm('Доступна новая версия приложения. Обновить?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Ошибка регистрации Service Worker:', error);
+                    });
+
+                // Перезагружаем страницу когда новый SW активируется
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
+                });
+            });
+
+            // Функция для кэширования книги для offline чтения
+            window.cacheBookForOffline = function(bookUrl) {
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'CACHE_BOOK',
+                        url: bookUrl
+                    });
+                }
+            };
+        }
+
+        // Обработка установки PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Показываем кнопку установки PWA (можно добавить в UI)
+            console.log('💡 PWA может быть установлено');
+
+            // Сохраняем промпт для последующего использования
+            window.showInstallPrompt = () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('✅ Пользователь установил PWA');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            };
+        });
+
+        // Отслеживаем успешную установку PWA
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA успешно установлено');
+            deferredPrompt = null;
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>
