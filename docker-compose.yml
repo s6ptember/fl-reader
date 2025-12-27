@@ -31,7 +31,13 @@ services:
     tmpfs:
       - /tmp
       - /app/.cache
-      - /var/lib/tor
+      - type: tmpfs
+        target: /var/lib/tor
+        tmpfs:
+          size: 10M
+          mode: 0700
+          uid: 1000
+          gid: 1000
 
   caddy:
     image: caddy:2-alpine
