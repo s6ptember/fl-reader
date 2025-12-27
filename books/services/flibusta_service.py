@@ -43,10 +43,20 @@ class FlibustaService:
                 author = 'Неизвестный автор'
                 title = title_text
 
-                if ' - ' in title_text:
-                    parts = title_text.split(' - ', 1)
-                    author = parts[0].strip()
-                    title = parts[1].strip()
+                parent = link.getparent()
+                if parent is not None:
+                    full_text = parent.text_content().strip()
+
+                    for separator in [' — ', ' - ', ': ', '—', ' – ']:
+                        if separator in full_text:
+                            parts = full_text.split(separator, 1)
+                            potential_author = parts[0].strip()
+                            potential_title = parts[1].strip() if len(parts) > 1 else title_text
+
+                            if len(potential_author) > 0 and len(potential_author) < 100:
+                                author = potential_author
+                                title = potential_title
+                                break
 
                 results.append({
                     'id': book_id,

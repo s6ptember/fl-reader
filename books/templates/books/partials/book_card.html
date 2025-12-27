@@ -1,9 +1,9 @@
 <div class="book-card group relative flex flex-col gap-3">
-    <div class="relative aspect-[2/3] w-full rounded-[24px] overflow-hidden transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 group-active:scale-95 shadow-xl group-hover:shadow-2xl cursor-pointer"
-         hx-get="{% url 'books:book_detail' book.id %}"
-         hx-target="body"
+    <div hx-get="{% url 'books:book_detail' book.id %}"
+         hx-target="#main-content"
          hx-swap="innerHTML"
-         hx-push-url="true">
+         hx-push-url="true"
+         class="relative aspect-[2/3] w-full rounded-[24px] overflow-hidden transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 group-active:scale-95 shadow-xl group-hover:shadow-2xl cursor-pointer">
 
         {% if book.cover %}
         <img src="{{ book.cover.url }}"
@@ -31,7 +31,7 @@
                 hx-confirm="Удалить книгу '{{ book.title }}'?"
                 hx-target="closest .book-card"
                 hx-swap="outerHTML swap:300ms"
-                onclick="event.stopPropagation()">
+                onclick="event.stopPropagation();">
             <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>

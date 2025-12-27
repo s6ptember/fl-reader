@@ -11,6 +11,7 @@ class Book(models.Model):
     flibusta_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='ID Флибусты')
     reading_progress = models.IntegerField(default=0, verbose_name='Прогресс чтения')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')
+    last_read = models.DateTimeField(null=True, blank=True, verbose_name='Последнее чтение')
 
     class Meta:
         verbose_name = 'Книга'
